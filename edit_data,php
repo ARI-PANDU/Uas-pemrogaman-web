@@ -1,0 +1,48 @@
+<?php
+include 'config.php';
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    $stmt = $conn->prepare("SELECT * FROM klasemen WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+}
+
+if (isset($_POST['update_data'])) {
+    $id = $_POST['id'];
+    $menang = $_POST['menang'];
+    $seri = $_POST['seri'];
+    $kalah = $_POST['kalah'];
+    $poin = $menang * 3 + $seri;
+
+    $stmt = $conn->prepare("UPDATE klasemen SET menang = ?, seri = ?, kalah = ?, poin = ? WHERE id = ?");
+    $stmt->bind_param("iiiii", $menang, $seri, $kalah, $poin, $id);
+    $stmt->execute();
+    $stmt->close();
+
+    header('location: klasemen.php');
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Data</title>
+</head>
+<body>
+    <form action="" method="post">
+        <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+        <label>Menang:</label>
+        <input type="number" name="menang" value="<?php echo $row['menang']; ?>" required><br>
+        <label>Seri:</label>
+        <input type="number" name="seri" value="<?php echo $row['seri']; ?>" required><br>
+        <label>Kalah:</label>
+        <input type="number" name="kalah" value="<?php echo $row['kalah']; ?>" required><br>
+        <button type="submit" name="update_data">Update Data</button>
+    </form>
+</body>
+</html>
